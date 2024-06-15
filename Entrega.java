@@ -41,7 +41,7 @@ import java.util.stream.Stream;
  * Podeu fer aquesta entrega en grups de com a màxim 3 persones, i necessitareu com a minim Java 10.
  * Per entregar, posau a continuació els vostres noms i entregau únicament aquest fitxer.
  * - Nom 1: Carlos Alejandro Pizzi Salas
- * - Nom 2: Bratlie Joao Bastidas Rivera 
+ * - Nom 2: Bratlie Joao Bastidas Rivera
  * - Nom 3:
  *
  * L'entrega es farà a través d'una tasca a l'Aula Digital que obrirem abans de la data que se us
@@ -71,20 +71,63 @@ class Entrega {
      * Vegeu el mètode Tema1.tests() per exemples.
      */
     static int exercici1(int n) {
-      return 0; // TODO
+      int contador = 0;
+      int numeroCombinaciones = (int) Math.pow(2, n);
+      for (int caso = 0; caso < numeroCombinaciones; caso++){
+        boolean resultado = true;
+        for(int j = 0; j < n; j++){
+          boolean verdadero = ((caso & (1 << j)) != 0);
+          resultado = (!resultado || verdadero);
+        }
+        if (resultado) {
+          contador++;
+        }
+      } 
+      return contador; // TODO
     }
 
     /*
      * És cert que ∀x : P(x) -> ∃!y : Q(x,y) ?
      */
     static boolean exercici2(int[] universe, Predicate<Integer> p, BiPredicate<Integer, Integer> q) {
-      return false; // TODO
+      for (int x : universe) {
+        if (p.test(x)) {
+          boolean unicaY = false;
+          for (int y : universe) {
+            if (q.test(x, y)) {
+              if (!unicaY) {
+                unicaY = true;
+              } else {
+                return false;
+              }
+            }
+          }
+          if (!unicaY) {
+            return false;
+          }
+        }
+      }
+      return true; // TODO
     }
 
     /*
      * És cert que ∃x : ∀y : Q(x, y) -> P(x) ?
      */
     static boolean exercici3(int[] universe, Predicate<Integer> p, BiPredicate<Integer, Integer> q) {
+      for (int x : universe) {
+        boolean paraTodoY = true;
+        for (int y : universe) {
+          if (q.test(x, y)) {
+            if (!p.test(x)) {
+              paraTodoY = false;
+              break;
+            }
+          }
+        }
+        if (paraTodoY) {
+          return true;
+        }
+      }
       return false; // TODO
     }
 
@@ -92,6 +135,29 @@ class Entrega {
      * És cert que ∃x : ∃!y : ∀z : P(x,z) <-> Q(y,z) ?
      */
     static boolean exercici4(int[] universe, BiPredicate<Integer, Integer> p, BiPredicate<Integer, Integer> q) {
+      for (int x : universe) {
+        boolean unicaY = false;
+        for (int y : universe) {
+          boolean paraTodoZ = true;
+          for (int z : universe) {
+            if (!(p.test(x, z) == q.test(y, z))) {
+              paraTodoZ = false;
+              break;
+            }
+          }
+          if (paraTodoZ) {
+            if (unicaY) {
+              unicaY = false;
+              break;
+            } else {
+              unicaY = true;
+            }
+          }
+        }
+        if (unicaY) {
+          return true;
+        }
+      }
       return false; // TODO
     }
 
