@@ -269,7 +269,25 @@ class Entrega {
      * Podeu soposar que `a`, `b` i `c` estan ordenats de menor a major.
      */
     static int exercici1(int[] a, int[] b, int[] c) {
-      return -1; // TODO
+      HashSet<Integer> unionAB = new HashSet<>();
+      for (int elemento : a) {
+        unionAB.add(elemento);
+      }
+      for (int elemento : b) {
+        unionAB.add(elemento);
+      }
+      
+      HashSet<Integer> diferenciaAC = new HashSet<>();
+      HashSet<Integer> C = new HashSet<>();
+      for (int elemento : c) {
+        C.add(elemento);
+      }
+      for (int elemento : a) {
+        if (!C.contains(elemento)) {
+          diferenciaAC.add(elemento);
+        }
+      }
+      return unionAB.size() * diferenciaAC.size();// TODO
     }
 
     /*
@@ -281,8 +299,59 @@ class Entrega {
      * Podeu soposar que `a` i `rel` estan ordenats de menor a major (`rel` lexicogràficament).
      */
     static int exercici2(int[] a, int[][] rel) {
-      return -1; // TODO
-    }
+      List<int[]> listaRelacion = new ArrayList<>(Arrays.asList(rel));
+      for (int elemento : a) {
+        boolean encontrado = false;
+        for (int[] pair : listaRelacion) {
+          if (pair[0] == elemento && pair[1] == elemento) {
+            encontrado = true;
+            break;
+          }
+        }
+        if (!encontrado) {
+          listaRelacion.add(new int[]{elemento, elemento});
+        }
+      }
+      List<int[]> symClosure = new ArrayList<>(listaRelacion);
+      for (int[] pair : listaRelacion) {
+        boolean encontrado = false;
+        for (int[] symPair : symClosure) {
+          if (symPair[0] == pair[1] && symPair[1] == pair[0]) {
+            encontrado = true;
+            break;
+          }
+        }
+        if (!encontrado) {
+          symClosure.add(new int[]{pair[1], pair[0]});
+        }
+      }
+      listaRelacion = symClosure;
+      boolean added;
+      do {
+        added = false;
+        List<int[]> newPairs = new ArrayList<>(listaRelacion);
+        for (int[] pair1 : listaRelacion) {
+          for (int[] pair2 : listaRelacion) {
+            if (pair1[1] == pair2[0]) {
+              boolean encontrado = false;
+              for (int[] transPair : newPairs) {
+                if (transPair[0] == pair1[0] && transPair[1] == pair2[1]) {
+                  encontrado = true;
+                  break;
+                }
+              }
+              if (!encontrado) {
+                newPairs.add(new int[]{pair1[0], pair2[1]});
+                added = true;
+              }
+            }
+          }
+        }
+        listaRelacion = newPairs;
+      } while (added);
+      return listaRelacion.size(); // TODO
+    } 
+    
 
     /*
      * Comprovau si la relació `rel` és un ordre total sobre `a`. Si ho és retornau el nombre
@@ -439,7 +508,7 @@ class Entrega {
       return generateRel(as, as, pred);
     }
   }
-
+  
   /*
    * Aquí teniu els exercicis del Tema 3 (Grafs).
    *
