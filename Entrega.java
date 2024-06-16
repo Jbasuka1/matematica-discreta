@@ -677,7 +677,16 @@ class Entrega {
       }
       return true;
     }
-
+    
+    static void nodosConexos(int[][] g, int nodo, boolean[] visitado) {
+      visitado[nodo] = true;
+      for (int vecino : g[nodo]) {
+        if (!visitado[vecino]) {
+          nodosConexos(g, vecino, visitado);
+        }
+      }
+    }
+    
     /*
      * Donat un tauler d'escacs d'amplada `w` i alçada `h`, determinau quin és el mínim nombre de
      * moviments necessaris per moure un cavall de la casella `i` a la casella `j`.
@@ -746,7 +755,16 @@ class Entrega {
       int preordenV = preorden[v];
       return preordenU <= preordenV;
     }
-
+    
+    static void preordenar(int[][] g, int nodo, int[] preorden, int[] indice) {
+        preorden[nodo] = indice[0];
+        indice[0]++;
+        for (int vecino : g[nodo]) {
+            if (preorden[vecino] == -1) {
+                preordenar(g, vecino, preorden, indice);
+            }
+        }
+    }
     /*
      * Donat un recorregut en preordre (per exemple, el primer vèrtex que hi apareix és `preord[0]`)
      * i el grau de cada vèrtex (per exemple, el vèrtex `i` té grau `d[i]`), trobau l'altura de
@@ -755,28 +773,28 @@ class Entrega {
      * L'altura d'un arbre arrelat és la major distància de l'arrel a les fulles.
      */
     static int exercici4(int[] preord, int[] d) {
-      return -1; // TO DO
-    }
-
-    static void nodosConexos(int[][] g, int nodo, boolean[] visitado) {
-      visitado[nodo] = true;
-      for (int vecino : g[nodo]) {
-        if (!visitado[vecino]) {
-          nodosConexos(g, vecino, visitado);
-        }
+      if (preord == null || preord.length == 0) {
+        return 0;
       }
+      int[] indice = {0}; 
+      return calcularAltura(preord, d, indice);
     }
     
-    static void preordenar(int[][] g, int nodo, int[] preorden, int[] indice) {
-        preorden[nodo] = indice[0];
-        indice[0]++;
-
-        for (int vecino : g[nodo]) {
-            if (preorden[vecino] == -1) {
-                preordenar(g, vecino, preorden, indice);
-            }
-        }
+    static int calcularAltura(int[] preorden, int[] d, int[] indice) {
+      int indiceActual = indice[0];
+      int nodoActual = preorden[indiceActual];
+      indice[0]++;
+      if (d[nodoActual] == 0) {
+        return 0;
+      }
+      int alturaMaxima = -1;
+      for (int i = 0; i < d[nodoActual]; i++) {
+        int alturaHijo = calcularAltura(preorden, d, indice);
+        alturaMaxima = Math.max(alturaMaxima, alturaHijo);
+      }
+      return alturaMaxima + 1;
     }
+    
     /*
      * Aquí teniu alguns exemples i proves relacionades amb aquests exercicis (vegeu `main`)
      */
