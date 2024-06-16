@@ -880,7 +880,7 @@ class Entrega {
       }
       int A = Math.abs(a);
       int B = Math.abs(b);
-      int mcd = euclidMCD(A, B);
+      int mcd = MCDeuclides(A, B);
       int mcm = A / mcd * B;
       return mcm;
     }
@@ -903,11 +903,11 @@ class Entrega {
             }
         }
         b = (b % n + n) % n;
-        int mcd = euclidMCD(a, n);
+        int mcd = MCDeuclides(a, n);
         if (b % mcd != 0) {
             return new int[]{};
         }
-        int[] solucionParticular = euclidExtendido(a, n);
+        int[] solucionParticular = euclidesExtendido(a, n);
         int x0 = solucionParticular[0] * (b / mcd) % n;
         List<Integer> soluciones = new ArrayList<>();
         for (int k = 0; k < mcd; k++) {
@@ -934,7 +934,10 @@ class Entrega {
      * té solució.
      */
     static boolean exercici3(int a, int b, int c, int d, int m, int n) {
-      return false; // TO DO
+      if (MCDeuclides(m, n) != 1) {
+        return false;
+      }
+      return true;
     }
 
     /*
@@ -948,10 +951,20 @@ class Entrega {
      * qüestió de segons independentment de l'entrada.
      */
     static int exercici4(int n, int k, int p) {
-      return -1; // TO DO
+      n = ((n % p) + p) % p;
+      int resultado = 1;
+      int base = n % p;
+      while (k > 0) {
+        if (k % 2 == 1) {
+          resultado = (resultado * base) % p;
+        }
+        k = k / 2;
+        base = (base * base) % p;
+      }
+      return resultado;
     }
     
-    static int euclidMCD(int a, int b) {
+    static int MCDeuclides(int a, int b) {
       while (b != 0) {
         int temp = b;
         b = a % b;
@@ -960,7 +973,7 @@ class Entrega {
       return a;
     }
     
-    static int[] euclidExtendido(int a, int b) {
+    static int[] euclidesExtendido(int a, int b) {
       int x0 = 1, y0 = 0, x1 = 0, y1 = 1;
       while (b != 0) {
         int q = a / b;
