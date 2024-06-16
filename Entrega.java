@@ -83,7 +83,7 @@ class Entrega {
           contador++;
         }
       } 
-      return contador; // TODO
+      return contador;
     }
 
     /*
@@ -107,7 +107,7 @@ class Entrega {
           }
         }
       }
-      return true; // TODO
+      return true;
     }
 
     /*
@@ -128,7 +128,7 @@ class Entrega {
           return true;
         }
       }
-      return false; // TODO
+      return false;
     }
 
     /*
@@ -158,7 +158,7 @@ class Entrega {
           return true;
         }
       }
-      return false; // TODO
+      return false;
     }
 
     /*
@@ -287,7 +287,7 @@ class Entrega {
           diferenciaAC.add(elemento);
         }
       }
-      return unionAB.size() * diferenciaAC.size();// TODO
+      return unionAB.size() * diferenciaAC.size();
     }
 
     /*
@@ -300,10 +300,11 @@ class Entrega {
      */
     static int exercici2(int[] a, int[][] rel) {
       List<int[]> listaRelacion = new ArrayList<>(Arrays.asList(rel));
+      // Clausura reflexiva
       for (int elemento : a) {
         boolean encontrado = false;
-        for (int[] pair : listaRelacion) {
-          if (pair[0] == elemento && pair[1] == elemento) {
+        for (int[] par : listaRelacion) {
+          if (par[0] == elemento && par[1] == elemento) {
             encontrado = true;
             break;
           }
@@ -312,44 +313,46 @@ class Entrega {
           listaRelacion.add(new int[]{elemento, elemento});
         }
       }
-      List<int[]> symClosure = new ArrayList<>(listaRelacion);
-      for (int[] pair : listaRelacion) {
+      // Clausura simétrica
+      List<int[]> clausuraSimetrica = new ArrayList<>(listaRelacion);
+      for (int[] par : listaRelacion) {
         boolean encontrado = false;
-        for (int[] symPair : symClosure) {
-          if (symPair[0] == pair[1] && symPair[1] == pair[0]) {
+        for (int[] parSimetrico : clausuraSimetrica) {
+          if (parSimetrico[0] == par[1] && parSimetrico[1] == par[0]) {
             encontrado = true;
             break;
           }
         }
         if (!encontrado) {
-          symClosure.add(new int[]{pair[1], pair[0]});
+          clausuraSimetrica.add(new int[]{par[1], par[0]});
         }
       }
-      listaRelacion = symClosure;
-      boolean added;
-      do {
+      listaRelacion = clausuraSimetrica;
+      // Clausura transitiva
+      boolean added = true;
+      while (added) {
         added = false;
-        List<int[]> newPairs = new ArrayList<>(listaRelacion);
-        for (int[] pair1 : listaRelacion) {
-          for (int[] pair2 : listaRelacion) {
-            if (pair1[1] == pair2[0]) {
+        List<int[]> paresNuevos = new ArrayList<>(listaRelacion);
+        for (int[] par1 : listaRelacion) {
+          for (int[] par2 : listaRelacion) {
+            if (par1[1] == par2[0]) {
               boolean encontrado = false;
-              for (int[] transPair : newPairs) {
-                if (transPair[0] == pair1[0] && transPair[1] == pair2[1]) {
+              for (int[] parTransicion : paresNuevos) {
+                if (parTransicion[0] == par1[0] && parTransicion[1] == par2[1]) {
                   encontrado = true;
                   break;
                 }
               }
               if (!encontrado) {
-                newPairs.add(new int[]{pair1[0], pair2[1]});
+                paresNuevos.add(new int[]{par1[0], par2[1]});
                 added = true;
               }
             }
           }
         }
-        listaRelacion = newPairs;
-      } while (added);
-      return listaRelacion.size(); // TODO
+        listaRelacion = paresNuevos;
+      }
+      return listaRelacion.size();
     } 
     
 
@@ -529,7 +532,18 @@ class Entrega {
      * Determinau si el graf és connex. Podeu suposar que `g` no és dirigit.
      */
     static boolean exercici1(int[][] g) {
-      return false; // TO DO
+      int n = g.length;
+      if (n <= 1) {
+        return true;
+      }      
+      boolean[] visitado = new boolean[n];
+      nodosConexos(g, 0, visitado);
+      for (int i = 0; i < n; i++) {
+        if (!visitado[i]) {
+          return false;
+        }
+      }
+      return true;
     }
 
     /*
@@ -544,7 +558,44 @@ class Entrega {
      * Retornau el nombre mínim de moviments, o -1 si no és possible arribar-hi.
      */
     static int exercici2(int w, int h, int i, int j) {
-      return -1; // TO DO
+      if (i < 0 || i >= w * h || j < 0 || j >= w * h) {
+        return -1;
+      }
+      List<int[]> cola = new ArrayList<>();
+      int inicioX = i % w;
+      int inicioY = i / w;
+      cola.add(new int[]{inicioY, inicioX});
+      
+      boolean[][] visitado = new boolean[h][w];
+      visitado[inicioY][inicioX] = true;
+      
+      int[][] distancia = new int[h][w];
+      distancia[inicioY][inicioX] = 0;
+      
+      int finX = j % w;
+      int finY = j / w;
+      int[][] movimientosCaballo = {
+        {-2, -1}, {-1, -2}, {1, -2}, {2, -1},
+        {2, 1}, {1, 2}, {-1, 2}, {-2, 1}
+      };
+      while (!cola.isEmpty()) {
+        int[] actual = cola.remove(0);
+        int x = actual[1];
+        int y = actual[0];
+        if (x == finX && y == finY) {
+          return distancia[y][x];
+        }
+        for (int[] movimiento : movimientosCaballo) {
+          int nuevaX = x + movimiento[1];
+          int nuevaY = y + movimiento[0];
+          if (nuevaX >= 0 && nuevaX < w && nuevaY >= 0 && nuevaY < h && !visitado[nuevaY][nuevaX]) {
+            visitado[nuevaY][nuevaX] = true;
+            distancia[nuevaY][nuevaX] = distancia[y][x] + 1;
+            cola.add(new int[]{nuevaY, nuevaX});
+          }
+        }
+      }
+      return -1;
     }
 
     /*
@@ -552,7 +603,16 @@ class Entrega {
      * abans (o igual) que el vèrtex `v` al recorregut en preordre de l'arbre.
      */
     static boolean exercici3(int[][] g, int r, int u, int v) {
-      return false; // TO DO
+      int n = g.length; 
+      int[] preorden = new int[n];
+      Arrays.fill(preorden, -1);
+      int[] indice = {0}; 
+      
+      preordenar(g, r, preorden, indice);
+
+      int preordenU = preorden[u];
+      int preordenV = preorden[v];
+      return preordenU <= preordenV;
     }
 
     /*
@@ -566,6 +626,25 @@ class Entrega {
       return -1; // TO DO
     }
 
+    static void nodosConexos(int[][] g, int nodo, boolean[] visitado) {
+      visitado[nodo] = true;
+      for (int vecino : g[nodo]) {
+        if (!visitado[vecino]) {
+          nodosConexos(g, vecino, visitado);
+        }
+      }
+    }
+    
+    static void preordenar(int[][] g, int nodo, int[] preorden, int[] indice) {
+        preorden[nodo] = indice[0];
+        indice[0]++;
+
+        for (int vecino : g[nodo]) {
+            if (preorden[vecino] == -1) {
+                preordenar(g, vecino, preorden, indice);
+            }
+        }
+    }
     /*
      * Aquí teniu alguns exemples i proves relacionades amb aquests exercicis (vegeu `main`)
      */
