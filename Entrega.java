@@ -363,10 +363,86 @@ class Entrega {
      * Podeu soposar que `a` i `rel` estan ordenats de menor a major (`rel` lexicogràficament).
      */
     static int exercici3(int[] a, int[][] rel) {
-      return -1; // TODO
+      int n = a.length;
+      boolean[][] relacion = new boolean[n][n];
+      // Llenar la matriz de relación
+      for (int[] par : rel) {
+        int i = indiceDe(a, par[0]);
+        int j = indiceDe(a, par[1]);
+        relacion[i][j] = true;
+      }
+      // Comprobar reflexividad
+      for (int i = 0; i < n; i++) {
+        if (!relacion[i][i]) {
+          return -2;
+        }
+      }
+      // Comprobar antisimetría
+      for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+          if (i != j && relacion[i][j] && relacion[j][i]) {
+            return -2;
+          }
+        }
+      }
+      // Comprobar transitividad
+      for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+          for (int k = 0; k < n; k++) {
+            if (relacion[i][j] && relacion[j][k] && !relacion[i][k]) {
+              return -2;
+            }
+          }
+        }
+      }
+      // Comprobar totalidad
+      for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+          if (!relacion[i][j] && !relacion[j][i]) {
+            return -2;
+          }
+        }
+      }
+      boolean[][] Hasse = new boolean[n][n];
+      for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+          if (i != j && relacion[i][j]) {
+            boolean esAristaHasse = true;
+            for (int k = 0; k < n; k++) {
+              if (k != i && k != j && relacion[i][k] && relacion[k][j]) {
+                esAristaHasse = false;
+                break;
+              }
+            }
+            if (esAristaHasse) {
+              Hasse[i][j] = true;
+            }
+          }
+        }
+      }
+      // Contar el número de aristas en el diagrama de Hasse
+      int contadorAristas = 0;
+      for (boolean[] fila : Hasse) {
+        for (boolean esArista : fila) {
+          if (esArista) {
+            contadorAristas++;
+          }
+        }
+      }
+      return contadorAristas;
     }
-
-
+    
+    static int indiceDe(int[] conjunto, int elemento) {
+      int indice = 0;
+      for (int elementoA : conjunto) {
+        if (elementoA == elemento) {
+          return indice;
+        }
+        indice++;
+      }
+      return -1;
+    }
+    
     /*
      * Comprovau si les relacions `rel1` i `rel2` són els grafs de funcions amb domini i codomini
      * `a`. Si ho son, retornau el graf de la composició `rel2 ∘ rel1`. Sino, retornau null.
@@ -375,9 +451,43 @@ class Entrega {
      * lexicogràficament).
      */
     static int[][] exercici4(int[] a, int[][] rel1, int[][] rel2) {
-      return new int[][] {}; // TODO
+      if (!esFuncio(a, rel1) || !esFuncio(a, rel2)) {
+        return null; 
+      }
+      return composicion(rel1, rel2);
     }
-
+    
+    static boolean esFuncio(int[] a, int[][] rel) {
+      for (int i = 0; i < a.length; i++) {
+        int x = a[i];
+        boolean encontrado = false;
+        for (int j = 0; j < rel.length; j++) {
+          if (rel[j][0] == x) {
+            if (encontrado) {
+              return false;
+            }
+            encontrado = true;
+          }
+        }
+        if (!encontrado) {
+          return false;
+        }
+      }
+      return true;
+    }
+    
+    static int[][] composicion(int[][] rel1, int[][] rel2) {
+      List<int[]> composicion = new ArrayList<>();
+      for (int[] par1 : rel1) {
+        for (int[] par2 : rel2) {
+          if (par1[1] == par2[0]) {
+            composicion.add(new int[]{par1[0], par2[1]});
+          }
+        }
+      }
+      return composicion.toArray(new int[0][0]);
+    }
+    
     /*
      * Comprovau si la funció `f` amb domini `dom` i codomini `codom` té inversa. Si la té, retornau
      * el seu graf (el de l'inversa). Sino, retornau null.
