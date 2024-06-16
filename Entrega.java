@@ -383,7 +383,35 @@ class Entrega {
      * el seu graf (el de l'inversa). Sino, retornau null.
      */
     static int[][] exercici5(int[] dom, int[] codom, Function<Integer, Integer> f) {
-      return new int[][] {}; // TODO
+      boolean[] visited = new boolean[codom.length];
+        List<int[]> graph = new ArrayList<>();
+
+        for (int i = 0; i < codom.length; i++) {
+            int y = codom[i];
+            boolean foundPreimage = false;
+
+            for (int j = 0; j < dom.length; j++) {
+                int x = dom[j];
+                if (f.apply(x) == y && !visited[j]) {
+                    graph.add(new int[]{y, x});
+                    visited[j] = true;
+                    foundPreimage = true;
+                    break;
+                }
+            }
+
+            if (!foundPreimage) {
+                return null; // No se encontró una preimagen para y en codom
+            }
+        }
+
+        // Convertir la lista de aristas a un array 2D
+        int[][] result = new int[graph.size()][2];
+        for (int i = 0; i < graph.size(); i++) {
+            result[i] = graph.get(i);
+        }
+
+        return result;
     }
 
     /*
