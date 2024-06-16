@@ -383,35 +383,29 @@ class Entrega {
      * el seu graf (el de l'inversa). Sino, retornau null.
      */
     static int[][] exercici5(int[] dom, int[] codom, Function<Integer, Integer> f) {
-      boolean[] visited = new boolean[codom.length];
-        List<int[]> graph = new ArrayList<>();
-
-        for (int i = 0; i < codom.length; i++) {
-            int y = codom[i];
-            boolean foundPreimage = false;
-
-            for (int j = 0; j < dom.length; j++) {
-                int x = dom[j];
-                if (f.apply(x) == y && !visited[j]) {
-                    graph.add(new int[]{y, x});
-                    visited[j] = true;
-                    foundPreimage = true;
-                    break;
-                }
-            }
-
-            if (!foundPreimage) {
-                return null; // No se encontró una preimagen para y en codom
-            }
+      boolean[] visitado = new boolean[codom.length];
+      List<int[]> g = new ArrayList<>();
+      for (int y : codom) {
+        boolean antiImagenEncontrado = false;
+        for (int j = 0; j < dom.length; j++) {
+          int x = dom[j];
+          if (f.apply(x) == y && !visitado[j]) {
+            g.add(new int[]{y, x});
+            visitado[j] = true;
+            antiImagenEncontrado = true;
+            break;
+          }
         }
-
-        // Convertir la lista de aristas a un array 2D
-        int[][] result = new int[graph.size()][2];
-        for (int i = 0; i < graph.size(); i++) {
-            result[i] = graph.get(i);
+        if (!antiImagenEncontrado) {
+          return null;
         }
-
-        return result;
+      }
+        
+      int[][] resultado = new int[g.size()][2];
+      for (int i = 0; i < g.size(); i++) {
+        resultado[i] = g.get(i);
+      }
+      return resultado;
     }
 
     /*
@@ -775,43 +769,31 @@ class Entrega {
     static int[] exercici2(int a, int b, int n) {
       if (a == 0) {
             if (b % n == 0) {
-                return new int[]{0}; // x = 0 es siempre solución
+                return new int[]{0};
             } else {
-                return new int[]{}; // No hay soluciones
+                return new int[]{};
             }
         }
-
-        // Reducir b módulo n para asegurar que esté en el rango [0, n-1]
         b = (b % n + n) % n;
-
-        // Calcular el máximo común divisor de a y n
         int mcd = euclidMCD(a, n);
-
-        // Verificar si la ecuación tiene solución
         if (b % mcd != 0) {
-            return new int[]{}; // No hay soluciones
+            return new int[]{};
         }
-
-        // Encontrar una solución particular usando el algoritmo extendido de Euclides
-        int[] solucionParticular = extendedEuclid(a, n);
-        int x0 = solucionParticular[0] * (b / mcd) % n; // x0 es la solución particular
-
-        // Construir todas las soluciones posibles
+        int[] solucionParticular = euclidExtendido(a, n);
+        int x0 = solucionParticular[0] * (b / mcd) % n;
         List<Integer> soluciones = new ArrayList<>();
         for (int k = 0; k < mcd; k++) {
             int x = (x0 + k * (n / mcd)) % n;
             if (x < 0) {
-                x += n; // Asegurar que x esté en el rango [0, n-1]
+                x += n;
             }
             soluciones.add(x);
         }
 
-        // Convertir el ArrayList a un array de int
         int[] resultado = new int[soluciones.size()];
         for (int i = 0; i < soluciones.size(); i++) {
             resultado[i] = soluciones.get(i);
         }
-
         return resultado;
     }
 
@@ -850,7 +832,7 @@ class Entrega {
       return a;
     }
     
-    static int[] extendedEuclid(int a, int b) {
+    static int[] euclidExtendido(int a, int b) {
       int x0 = 1, y0 = 0, x1 = 0, y1 = 1;
       while (b != 0) {
         int q = a / b;
