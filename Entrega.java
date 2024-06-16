@@ -753,7 +753,14 @@ class Entrega {
      * Calculau el mínim comú múltiple de `a` i `b`.
      */
     static int exercici1(int a, int b) {
-      return -1; // TO DO
+      if (a == 0 || b == 0) {
+        return 0;
+      }
+      int A = Math.abs(a);
+      int B = Math.abs(b);
+      int mcd = euclidMCD(A, B);
+      int mcm = A / mcd * B;
+      return mcm;
     }
 
     /*
@@ -794,7 +801,15 @@ class Entrega {
     static int exercici4(int n, int k, int p) {
       return -1; // TO DO
     }
-
+    
+    static int euclidMCD(int a, int b) {
+      while (b != 0) {
+        int temp = b;
+        b = a % b;
+        a = temp;
+      }
+      return a;
+    }
     /*
      * Aquí teniu alguns exemples i proves relacionades amb aquests exercicis (vegeu `main`)
      */
