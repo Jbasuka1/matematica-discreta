@@ -773,7 +773,46 @@ class Entrega {
      * Podeu suposar que `n > 1`. Recordau que no no podeu utilitzar la força bruta.
      */
     static int[] exercici2(int a, int b, int n) {
-      return new int[] {}; // TO DO
+      if (a == 0) {
+            if (b % n == 0) {
+                return new int[]{0}; // x = 0 es siempre solución
+            } else {
+                return new int[]{}; // No hay soluciones
+            }
+        }
+
+        // Reducir b módulo n para asegurar que esté en el rango [0, n-1]
+        b = (b % n + n) % n;
+
+        // Calcular el máximo común divisor de a y n
+        int mcd = euclidMCD(a, n);
+
+        // Verificar si la ecuación tiene solución
+        if (b % mcd != 0) {
+            return new int[]{}; // No hay soluciones
+        }
+
+        // Encontrar una solución particular usando el algoritmo extendido de Euclides
+        int[] solucionParticular = extendedEuclid(a, n);
+        int x0 = solucionParticular[0] * (b / mcd) % n; // x0 es la solución particular
+
+        // Construir todas las soluciones posibles
+        List<Integer> soluciones = new ArrayList<>();
+        for (int k = 0; k < mcd; k++) {
+            int x = (x0 + k * (n / mcd)) % n;
+            if (x < 0) {
+                x += n; // Asegurar que x esté en el rango [0, n-1]
+            }
+            soluciones.add(x);
+        }
+
+        // Convertir el ArrayList a un array de int
+        int[] resultado = new int[soluciones.size()];
+        for (int i = 0; i < soluciones.size(); i++) {
+            resultado[i] = soluciones.get(i);
+        }
+
+        return resultado;
     }
 
     /*
@@ -810,6 +849,24 @@ class Entrega {
       }
       return a;
     }
+    
+    static int[] extendedEuclid(int a, int b) {
+      int x0 = 1, y0 = 0, x1 = 0, y1 = 1;
+      while (b != 0) {
+        int q = a / b;
+        int temp = b;
+        b = a % b;
+        a = temp;
+        temp = x1;
+        x1 = x0 - q * x1;
+        x0 = temp;
+        temp = y1;
+        y1 = y0 - q * y1;
+        y0 = temp;
+      }
+      return new int[]{x0, y0};
+    }
+
     /*
      * Aquí teniu alguns exemples i proves relacionades amb aquests exercicis (vegeu `main`)
      */
