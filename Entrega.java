@@ -896,33 +896,32 @@ class Entrega {
      */
     static int[] exercici2(int a, int b, int n) {
       if (a == 0) {
-            if (b % n == 0) {
-                return new int[]{0};
-            } else {
-                return new int[]{};
-            }
+        if (b % n == 0) {
+          return new int[]{0};
+        } else {
+          return new int[]{};
+        }}
+      
+      b = (b % n + n) % n;
+      int mcd = MCDeuclides(a, n);
+      if (b % mcd != 0) {
+        return new int[]{};
+      }
+      int[] solucionParticular = euclidesExtendido(a, n);
+      int x0 = solucionParticular[0] * (b / mcd) % n;
+      List<Integer> soluciones = new ArrayList<>();
+      for (int k = 0; k < mcd; k++) {
+        int x = (x0 + k * (n / mcd)) % n;
+        if (x < 0) {
+          x += n;
         }
-        b = (b % n + n) % n;
-        int mcd = MCDeuclides(a, n);
-        if (b % mcd != 0) {
-            return new int[]{};
-        }
-        int[] solucionParticular = euclidesExtendido(a, n);
-        int x0 = solucionParticular[0] * (b / mcd) % n;
-        List<Integer> soluciones = new ArrayList<>();
-        for (int k = 0; k < mcd; k++) {
-            int x = (x0 + k * (n / mcd)) % n;
-            if (x < 0) {
-                x += n;
-            }
-            soluciones.add(x);
-        }
-
-        int[] resultado = new int[soluciones.size()];
-        for (int i = 0; i < soluciones.size(); i++) {
-            resultado[i] = soluciones.get(i);
-        }
-        return resultado;
+        soluciones.add(x);
+      }
+      int[] resultado = new int[soluciones.size()];
+      for (int i = 0; i < soluciones.size(); i++) {
+        resultado[i] = soluciones.get(i);
+      }
+      return resultado;
     }
 
     /*
